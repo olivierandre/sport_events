@@ -1,14 +1,19 @@
 # Sport events project
 
-Stack : Vue.js
+Tools
 
-### Installation
+* Vue.js
+* Vue-cli
+* Element
+* Yarn
+
+## Installation
 ```
 yarn install
 
 ```
 
-### Launch project
+## Launch project
 ```
 yarn serve
 
