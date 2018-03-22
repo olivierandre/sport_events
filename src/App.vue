@@ -1,17 +1,23 @@
 <template>
-<div id="app" class="page-container">
-  <nav-bar @createEvent="manageEventForm" @showNotification="showNotif"></nav-bar>
-  <router-view @showNotification="showNotif"></router-view>
-</div>
+<b-container fluid>
+  <div id="app" class="page-container">
+    <nav-bar @createEvent="manageEventForm" @showNotification="showNotif" @changeRoute="changeRoute"></nav-bar>
+    <router-view @showNotification="showNotif"></router-view>
+    <foo-ter @createEvent="manageEventForm" @showNotification="showNotif" @changeRoute="changeRoute" :currentRoute="path"></foo-ter>
+  </div>
+</b-container>
 </template>
+
 
 <script>
 import NavBar from "./components/Layout/NavBar"
+import FooTer from "./components/Layout/Footer"
 import EventBus from "./event-bus"
 export default {
   name: 'app',
   components: {
-    NavBar
+    NavBar,
+    FooTer
   },
   data() {
     return {
@@ -19,7 +25,8 @@ export default {
       show: false,
       showAlert: false,
       showForm: false,
-      events: []
+      events: [],
+      path: 'Events'
     }
 
   },
@@ -36,18 +43,22 @@ export default {
     closeEventForm() {
       this.showForm = false
     },
+    changeRoute() {
+      this.path = this.$route.path
+    }
   },
   mounted() {
     EventBus.$on('showNotification', payload => {
       this.showNotif(payload)
     });
+    this.changeRoute()
+
   }
 }
 </script>
 
 <style lang="scss">
 body {
-    width: 1140px;
     margin: 0 auto;
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
 }

@@ -10,11 +10,9 @@ Tools
 ## Installation
 ```
 yarn install
-
 ```
 
 ## Launch project
 ```
 yarn serve
-
 ```

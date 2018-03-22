@@ -1,29 +1,40 @@
 <template>
-<el-container>
-  <el-main v-if="show">
-    <el-form :rules="rules" ref="form" :model="currentUser" label-position="left">
-      <el-form-item label="Name" prop="name">
-        <el-input placeholder="Your name" v-model="currentUser.name"></el-input>
-      </el-form-item>
-
-      <el-form-item label="Address">
-        <el-input placeholder="Your address" v-model="currentUser.address"></el-input>
-      </el-form-item>
-
-      <el-form-item label="Town">
-        <el-input placeholder="Your town" v-model="currentUser.town"></el-input>
-      </el-form-item>
-
-      <el-form-item label="Birthday">
-        <el-date-picker value-format="dd/MM/yyyy" format="dd/MM/yyyy" align="left" placeholder="Your birthday" v-model="currentUser.birthday"></el-date-picker>
-      </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit('form')">Update</el-button>
-      </el-form-item>
-    </el-form>
-  </el-main>
-</el-container>
+<div v-if="show" class="profile">
+  <b-row class="info">
+    <b-col cols="12">
+      <h2>{{ currentUser.name }}</h2>
+    </b-col>
+    <b-col cols="4">
+      <p class="highlight">{{ currentUser.games.played }}</p>
+      <p class="highlight">joués</p>
+    </b-col>
+    <b-col cols="4">
+      <p class="highlight">{{ currentUser.games.favorite.average }}</p>
+      <p class="highlight">{{ getSport(currentUser.games.favorite.sport) }}</p>
+    </b-col>
+    <b-col cols="4">
+      <p class="highlight">{{ currentUser.games.organized }}</p>
+      <p class="highlight">organisés</p>
+    </b-col>
+  </b-row>
+  <b-row class="more-info">
+    <b-col cols="12">
+      <p>Créneaux favoris</p>
+    </b-col>
+    <b-col cols="8">
+      <span v-for="(day, index) in days" :key="index" :class="{ active: isDayActive(index)}">{{ day }}</span>
+    </b-col>
+    <b-col cols="4">
+      <p class="highlight">{{ currentUser.available.time }}</p>
+    </b-col>
+    <b-col cols="12">
+      <p>Spots favoris</p>
+    </b-col>
+    <b-col cols="12">
+      <span class="highlight" v-for="(spot, index) in currentUser.favorite_spots" :key="index">{{ spot }} <span v-if="index !== last">/</span> </span>
+    </b-col>
+  </b-row>
+</div>
 </template>
 
 <script>
@@ -47,16 +58,49 @@ export default {
           }
           ],
       },
-      show: false
+      show: false,
+      days: ['L', 'M', 'M', 'J', 'V', 'S', 'D']
     }
 
+  },
+  computed: {
+    // https://jsfiddle.net/wv2ujxvn/6/
+    last() {
+      return Object.keys(this.currentUser.favorite_spots).length - 1;
+    }
   },
   methods: {
     getCurrentUser() {
       axios.get('/api/profile').then(results => {
         this.currentUser = results.data.users[0]
+      }).then(() => {
         this.show = true;
       })
+    },
+    getAllSports() {
+      axios.get('/api/sports').then(results => {
+        this.sports = results.data.sports
+      })
+    },
+    getSport(id) {
+      var name = ''
+      this.sports.filter(function (sport) {
+        if (sport.id == id) {
+          name = sport.name
+        }
+      })
+      return name;
+    },
+    isDayActive(index) {
+      var isActive = false;
+      this.currentUser.available.day.filter(day => {
+        if (day === index) {
+          isActive = true
+        }
+      })
+
+      return isActive;
+
     },
     onSubmit(formName) {
       this.$refs[formName].validate((valid) => {
@@ -81,13 +125,36 @@ export default {
   },
   created() {
     this.getCurrentUser();
+    this.getAllSports();
   }
 }
 </script>
 
 
 <style lang="scss" scoped>
-p {
+.profile {
+    margin-bottom: 30px;
+}
+.active,
+.highlight {
+    color: #32B028;
+    font-weight: 700;
+}
+.info,
+.more-info {
+    border-bottom: 1px solid #7D7D7D;
+}
+.info {
+
+    p {
+        text-align: center;
+    }
+}
+.more-info {
     text-align: left;
+    span {
+        margin-right: 5px;
+    }
+
 }
 </style>

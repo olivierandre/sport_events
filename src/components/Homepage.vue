@@ -1,9 +1,5 @@
 <template>
-<el-container>
-  <el-main>
-    <events></events>
-  </el-main>
-</el-container>
+<events></events>
 </template>
 
 <script>

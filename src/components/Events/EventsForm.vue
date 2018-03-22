@@ -3,15 +3,19 @@
   <el-main>
     <el-form :rules="rules" ref="add_event" :model="evt" label-position="top">
       <el-form-item label="Id">
-        <el-input :disabled="true " v-model="evt.id "></el-input>
+        <el-input :disabled="true " v-model="evt.id"></el-input>
       </el-form-item>
 
       <el-form-item label="Name" prop="name">
-        <el-input placeholder="Name event " v-model="evt.name "></el-input>
+        <el-input placeholder="Name event " v-model="evt.name"></el-input>
       </el-form-item>
 
-      <el-form-item label="Meeting point" prop="name">
-        <el-input placeholder="Meeting point " v-model="evt.address "></el-input>
+      <el-form-item label="Price" prop="number">
+        <el-input-number v-model="evt.price" :min="1"></el-input-number>
+      </el-form-item>
+
+      <el-form-item label="Free place" prop="number">
+        <el-input-number v-model="evt.freePlace" :min="1"></el-input-number>
       </el-form-item>
 
       <el-form-item label="Choose sport" prop="sport">
@@ -41,9 +45,11 @@ export default {
     return {
       evt: {
         date: '',
-        address: '',
+        name: '',
         sport: '',
-        id: ''
+        id: '',
+        price: '',
+        freePlace: ''
       },
       rules: {
         name: [
@@ -82,8 +88,18 @@ export default {
       this.evt.name = ''
       this.evt.date = ''
       this.evt.sport = ''
-      this.evt.address = ''
+      this.evt.price = ''
+      this.evt.freePlace = ''
       this.evt.id = this.evt.id + 1
+    },
+    getSport(name) {
+      var id = ''
+      this.sports.filter(function (sport) {
+        if (sport.name == name) {
+          id = sport.id
+        }
+      })
+      return id;
     },
     onSubmit(formName) {
       this.$refs[formName].validate((valid) => {
@@ -91,10 +107,11 @@ export default {
           axios.post('/api/events', {
             id: this.evt.id,
             date: this.evt.date,
-            sport: this.evt.sport,
+            sport: this.getSport(this.evt.sport),
             name: this.evt.name,
             user: this.user.name,
-            address: this.evt.address
+            price: this.evt.price,
+            freePlace: this.evt.freePlace
           }).then(results => {
             this.clear()
             EventBus.$emit('showNotification', {
